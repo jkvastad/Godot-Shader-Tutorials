@@ -29,3 +29,14 @@ In more detail:
 * When all the models are placed correctly relative to the camera we want to project the meshes onto the screen. This is done with a "projection matrix", which places all the objects into a standard cube (for GPU technical reasons). Depending on the matrix used we end up with e.g. a perspective or an orthographic camera result.
 * The meshes in the cube are then scaled to fit the viewport using the "Window-Viewport" matrix, taking care of aspect ratios and screen sizes.
 * Finally we are ready to color pixels. This is called rasterisation, where we make a grid of pixels corresponding to the screen pixels, then look through this grid (or raster) at the scene displayed after all of the above transformations. Following [rasterisation rules](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules) the GPU decides which color to assign to which pixel.
+
+## Godot shaders in practice
+When writing godot shaders we will mostly be writing code in a vertex or fragment function (a.k.a. vertex/fragment shaders). 
+* The vertex shader runs on each vertex of a given mesh prior to the matrix transformations.
+* The fragment shader runs on each pixel after rasterisation.
+
+It is possible to send data to the fragment shader from the vertex shader. This can at first be quite perplexing, as it is not common knowledge how a vertex (a concept close to a point in 3D space) should send data to a screen pixel. The answer lies in [barycentric interpolation](https://en.wikipedia.org/wiki/Barycentric_coordinate_system). 
+
+When the fragment shader is to decide what color to choose for its pixel, it is handed a single "best" triangle by the rasterizer. The current pixel might not be perfectly on a vertex of this triangle - it is most likely somewhere on the triangles interior. To decide on a pixel value, **the fragment shader interpolates a final value based on the values assigned to the triangle's vertices.**
+
+This is why the variable type for sending data between vertex and fragment shader is called a varying - because the value will vary depending on where the pixel hits on the triangle and the result of the interpolation.
