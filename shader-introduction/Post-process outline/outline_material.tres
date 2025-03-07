@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://b7pwbvblf7cdv"]
+
+[ext_resource type="Shader" path="res://Post-Process Outline/outline_shader.gdshader" id="1_x4ywo"]
+[ext_resource type="Shader" path="res://Post-Process Outline/normal_shader.gdshader" id="2_gdk8p"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ee4yp"]
+render_priority = 0
+shader = ExtResource("1_x4ywo")
+
+[resource]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_ee4yp")
+shader = ExtResource("2_gdk8p")
