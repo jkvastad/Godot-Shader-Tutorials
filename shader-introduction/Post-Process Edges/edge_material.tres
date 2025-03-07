@@ -1,7 +1,7 @@
 [gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://b7pwbvblf7cdv"]
 
-[ext_resource type="Shader" path="res://Post-Process Outline/outline_shader.gdshader" id="1_x4ywo"]
-[ext_resource type="Shader" path="res://Post-Process Outline/normal_shader.gdshader" id="2_gdk8p"]
+[ext_resource type="Shader" path="res://Post-Process Edges/edge_shader.gdshader" id="1_x4ywo"]
+[ext_resource type="Shader" path="res://Post-Process Edges/normal_shader.gdshader" id="2_gdk8p"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ee4yp"]
 render_priority = 0

@@ -1,14 +1,14 @@
 // Shader for coloring surfaces with model normals.
 // Used to e.g. separate planes in post processing
 shader_type spatial;
-varying flat vec3 vertex_normal;   
+varying flat vec3 model_normal;   
 
 void vertex() {	        
 	// Use model normals instead of world normals
-	vertex_normal = NORMAL;
+	model_normal = NORMAL;
 }
 
 void fragment() {		
 	// negative values are clamped to 0, instead discard negative sign
-	ALBEDO = abs(vertex_normal);
+	ALBEDO = abs(model_normal);
 }
