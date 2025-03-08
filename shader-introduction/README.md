@@ -31,11 +31,11 @@ The [Wikipedia page on graphics pipelines](https://en.wikipedia.org/wiki/Graphic
 * Finally we are ready to color pixels. This is called [rasterisation](https://en.wikipedia.org/wiki/Rasterisation), where we make a grid of pixels corresponding to the screen or viewport pixels, then look through this grid (or raster) at the scene displayed after all of the above transformations. Following [rasterisation rules](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules) the GPU decides which color to assign to which pixel.
 
 ## Godot shaders in practice
-When writing godot shaders we will mostly be writing code in a vertex or fragment function (a.k.a. vertex/fragment shaders). 
+When writing godot shaders we will mostly be writing code in a vertex or fragment function, a.k.a. vertex/fragment shaders. 
 * The vertex shader runs on each vertex of a given mesh prior to the matrix transformations.
 * The fragment shader runs on each pixel after rasterisation.
 
-It is possible to send data to the fragment shader from the vertex shader. This can at first be quite perplexing, as it is not common knowledge how a vertex (a concept close to a point in 3D space) should send data to a screen pixel. The answer lies in [barycentric interpolation](https://en.wikipedia.org/wiki/Barycentric_coordinate_system). 
+It is possible to send data to the fragment shader from the vertex shader. This can at first be quite perplexing, as it is not obvious how a vertex (a concept close to a point in 3D space) should send data to a screen pixel. The answer lies in [barycentric interpolation](https://en.wikipedia.org/wiki/Barycentric_coordinate_system). 
 
 When the fragment shader is to decide what color to choose for its pixel, it is handed a single "best" triangle by the rasterizer. The current pixel might not be perfectly on a vertex of this triangle - it is most likely somewhere on the triangles interior. To decide on a pixel value, **the fragment shader interpolates a final value based on the values assigned to the triangle's vertices.**
 
