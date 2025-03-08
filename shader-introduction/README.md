@@ -8,27 +8,27 @@ While an ordinary program runs on the CPU (Central Processing Unit), a shader is
 
 ### Why don't we just use CPU languages for the GPU?
 
-When writing for a CPU we (mostly) write code which runs "line by line". No funny business. This is usually fine, until we want to write a computer game and have to update the screen pixel colors.
+When writing for a CPU we (mostly) write code which runs line by line in a single thread. This is usually fine, until we want to write a computer game and have to update the screen pixel colors.
 
 A common desktop display resolution is 1920×1080 = 2 073 600 (~10^6) pixels. If we want 60 fps then that is 1920×1080×60 = 124 416 000 (~10^8) pixels per second. Modern CPs have a few GHz (~10^9) in clock speed, which means the job of keeping the screen painted would eat a sizeable chunk of the CPU budget, leaving little for running the game.
 
-GPUs solve this problem by calculating the pixels in parallell, thus cutting the number of cycles down potentially by the millions. This comes with the cost of using another hardware architecture with its own constraints and languages.
+GPUs solve this problem by calculating the pixels in parallell, thus cutting the number of cycles down potentially by the millions. This comes at the cost of using another hardware architecture with its own constraints and languages.
 
 ## How a shader works
 The [Wikipedia page on graphics pipelines](https://en.wikipedia.org/wiki/Graphics_pipeline) outlines the basics. In summary, to go from a 3D model to pixels on the screen:
 
-1. Create models, or meshes.
+1. Create models using polygon meshes.
 2. Place the models in a game world relative to a camera.
 3. Project the objects onto pixels on the screen.
 
-In more detail:
+### In more detail
 
-* A model, or [mesh](https://en.wikipedia.org/wiki/Polygon_mesh), is created in e.g. [Blender](https://www.blender.org/). To the computer, the mesh is mostly a collection of vertices - vector like data objects specifying e.g. the various corners of the polygon mesh and colors related to these corners.
-* A model is defined in its own coordinate system, but if we want multiple models in our game the vertices of the respective models must be transformed so that the models are placed at the right place in our game world (we don't want everything stacked in a heap at the world origin). Transforming vectors is done via matrix multiplication and the relevant matrix is called the "world matrix" which is specific to each model, specifying where it is placed in the game world.
-* We look at the game world via a camera, and so a "camera matrix" transforms the models yet again to place them relative to the cameras coordinate system.
-* When all the models are placed correctly relative to the camera we want to project the meshes onto the screen. This is done with a "projection matrix", which places all the objects into a standard cube (for GPU technical reasons). Depending on the matrix used we end up with e.g. a perspective or an orthographic camera result.
-* The meshes in the cube are then scaled to fit the viewport using the "Window-Viewport" matrix, taking care of aspect ratios and screen sizes.
-* Finally we are ready to color pixels. This is called rasterisation, where we make a grid of pixels corresponding to the screen pixels, then look through this grid (or raster) at the scene displayed after all of the above transformations. Following [rasterisation rules](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules) the GPU decides which color to assign to which pixel.
+* A model, or [mesh](https://en.wikipedia.org/wiki/Polygon_mesh), is created in e.g. [Blender](https://www.blender.org/). To the computer, the mesh is mostly a collection of [vertices](https://en.wikipedia.org/wiki/Vertex_(computer_graphics)) - data objects similar to a bag of vectors or arrays; specifying e.g. the various corners of the polygon mesh and colors related to these corners. Often vertex is used interchangeably with a [3D coordinate vector](https://en.wikipedia.org/wiki/Coordinate_vector) (even though the position vector is just a part of the vertex).
+* A model is defined in its own coordinate system. Since we want multiple models in a game the vertices of the respective models must be transformed so that the models are placed at the right place in our game world (we don't want everything stacked in a heap at the world origin). Transforming vectors is done via matrix multiplication, and the relevant matrix is called the "world matrix" which is specific to each model - specifying where it is placed in the game world.
+* We look at the game world via a camera, and so a "camera matrix", or "view matrix",  transforms the models yet again to place them relative to the cameras coordinate system.
+* There are different kinds of camera projections. A perspective camera gives a "normal" view where objects further away are smaller. An orthographic camera instead keeps object heights, making it look as if everything is up close. The type of projection is decided by the "projection matrix".
+* There are differently sized screens (and within screens, application windows). This is handled by the "Window-Viewport" matrix, taking care of aspect ratios and window sizes.
+* Finally we are ready to color pixels. This is called [rasterisation](https://en.wikipedia.org/wiki/Rasterisation), where we make a grid of pixels corresponding to the screen or viewport pixels, then look through this grid (or raster) at the scene displayed after all of the above transformations. Following [rasterisation rules](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules) the GPU decides which color to assign to which pixel.
 
 ## Godot shaders in practice
 When writing godot shaders we will mostly be writing code in a vertex or fragment function (a.k.a. vertex/fragment shaders). 
