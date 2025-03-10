@@ -117,7 +117,7 @@ In the shader introduction project, there is a folder called [Post-Process Edges
 
 ![Godot_fragment_edges](https://github.com/user-attachments/assets/fccd902d-b288-4f72-83a8-e2f43773ea68)
 
-Notice how the edges disappear when the cubes touch! This is because we are using a post-process shader, which calculates the edges based on the screen colors of a previously rendered screen. This animation uses two shaders - first one to color the face normals of the cube, which is then used by the second shader to color edges when normals change:
+Notice how the edges disappear when the cubes touch! This is because we are using a post-process shader, which calculates the edges based on the screen colors of a previously rendered screen. This animation uses two shaders - first one to color the face normals of the cube, which is then used by the second shader to color edges when normals change (Note in the fragment_edges.tscn how the MeshInstance3D's mesh's material's shader has its next pass option set to the edge shader):
 
 ```glsl
 // Shader for coloring surfaces with model normals.
