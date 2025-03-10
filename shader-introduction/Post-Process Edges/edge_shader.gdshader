@@ -2,7 +2,7 @@
 // Assumes the model is colored according to its model normals
 shader_type spatial;
 render_mode unshaded;
-//Screen pixel colors from precious rendering pass
+//Screen pixel colors from previous rendering pass
 uniform sampler2D screen_texture : hint_screen_texture; 
 
 bool is_neighbour_pixel_same_color(vec3 color,vec2 screen_uv_offset){
