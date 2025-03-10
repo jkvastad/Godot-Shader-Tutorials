@@ -30,15 +30,53 @@ The [Wikipedia page on graphics pipelines](https://en.wikipedia.org/wiki/Graphic
 * There are differently sized screens (and within screens, application windows). This is handled by the "Window-Viewport" matrix, taking care of aspect ratios and window sizes.
 * Finally we are ready to color pixels. This is called [rasterisation](https://en.wikipedia.org/wiki/Rasterisation), where we make a grid of pixels corresponding to the screen or viewport pixels, then look through this grid (or raster) at the scene displayed after all of the above transformations. Following [rasterisation rules](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules) the GPU decides which color to assign to which pixel.
 
-Figure below: Pipeline flowchart of typical 3D hardware. Note the position of the vertex shader and pixel (fragment) shader.
+**Figure below:** Rasterisation on primitives (here triangles, could be lines or points), picture from [Microsoft article on rasterisation rules](https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-rasterizer-stage-rules). This is what the rasterizer sees after the viewport transform has been performed, primitives outside the viewport have been clipped and backfacing primitives have been culled.
+
+![Rasterisation](https://learn.microsoft.com/en-us/windows/win32/direct3d11/images/d3d10-rasterrulestriangle.png)
+
+**Figure below:** Pipeline flowchart of typical 3D hardware. Note the position of the vertex shader and pixel (fragment) shader.
+
 ![3D Pipeline](https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/3D-Pipeline.svg/1280px-3D-Pipeline.svg.png)
 ## Godot shaders in practice
+### Fragment and Vertex shader
 When writing godot shaders we will mostly be writing code in a vertex or fragment function, a.k.a. vertex/fragment shaders. 
 * The vertex shader runs on each vertex of a given mesh prior to the matrix transformations.
 * The fragment shader runs on each pixel after rasterisation.
 
 It is possible to send data to the fragment shader from the vertex shader. This can at first be quite perplexing, as it is not obvious how a vertex (a concept close to a point in 3D space) should send data to a screen pixel. The answer lies in [barycentric interpolation](https://en.wikipedia.org/wiki/Barycentric_coordinate_system). 
 
-When the fragment shader is to decide what color to choose for its pixel, it is handed a single "best" triangle by the rasterizer. The current pixel might not be perfectly on a vertex of this triangle - it is most likely somewhere on the triangles interior. To decide on a pixel value, **the fragment shader interpolates a final value based on the values assigned to the triangle's vertices.**
+When the fragment shader is to decide what color to choose for its pixel, it is handed a single "best" triangle by the rasterizer. The current pixel might not fall perfectly on a vertex of this triangle - it most likely falls somewhere on the triangles interior. To decide on a pixel value, **the fragment shader interpolates a final value based on the values assigned to the triangle's vertices.** 
 
-This is why the variable type for sending data between vertex and fragment shader is called a varying - because the value will vary depending on where the pixel hits on the triangle and the result of the interpolation.
+This is why the variable type for sending data between vertex and fragment shader is called a varying - because the value will vary depending on where the pixel hits on the triangle and the result of the interpolation. But exactly how does it vary? Behold the cube:
+
+![Barycentric interpolation](https://github.com/user-attachments/assets/0bf6ca90-41e4-45b4-99d6-126b4f5ab8de)
+
+The cube is a godot BoxMesh with the following shader applied:
+
+```glsl
+// Displays barycentric coordinates as colors
+// This illustrates how varying type variables interpolate values sent from the vertex shader to the fragment shader.
+shader_type spatial;
+varying vec3 vertex_position;
+
+//Corners of a triangle receive a unit weight (báros greek for weight)
+const vec3 BARYCENTRIC_COORDINATES[] = {
+	vec3(1.0,0.0,0.0),
+	vec3(0.0,1.0,0.0),
+	vec3(0.0,0.0,1.0)
+};
+
+void vertex() {
+	// Current vertex index (search for "VBO indexing" for more details)
+	// Every three indices make a triangle
+	vertex_position = BARYCENTRIC_COORDINATES[VERTEX_ID%3];	
+}
+
+void fragment() {
+	// Note how the colors are interpolated between the vertices of our cubes triangles
+	ALBEDO = vertex_position;	
+}
+
+```
+
+Note how each corner of each triangle on the cube is red, greed or blue, and the values inbetween are interpolated between them.
