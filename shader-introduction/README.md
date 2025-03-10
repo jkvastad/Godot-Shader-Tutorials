@@ -81,12 +81,43 @@ void fragment() {
 
 Note how each corner of each triangle on the cube is red, greed or blue, and the values inbetween are interpolated between them.
 
-### Vertex shader application: drawing cube edges
+### Shader application: drawing cube edges
+In the shader introduction project, there is a folder called [Cube Vertex Edges](https://github.com/jkvastad/Godot-Shader-Tutorials/tree/main/shader-introduction/Cube%20Vertex%20Edges). Running the scene in this project yields the following animation loop:
+
+![Edge_Shader](https://github.com/user-attachments/assets/327987c3-3869-4718-896d-427e3818709e)
+
+Notice how there is some z-fighting due to floating point rounding when the cubes overlap. The edges are drawn by exploiting the geometry of the cube and passing the (interpolated) information along to the fragment shader:
+```glsl
+// Draws the edges of a cube
+// Uses cube specific vertex positions to calculate edges
+shader_type spatial;
+render_mode unshaded;
+varying vec3 model_vertex;
+
+void vertex() {	
+	model_vertex = VERTEX;
+}
+
+void fragment() {	
+	float threshold = 0.99;
+	float xy = abs(model_vertex.x) + abs(model_vertex.y);
+	float xz = abs(model_vertex.x) + abs(model_vertex.z);
+	float yz = abs(model_vertex.y) + abs(model_vertex.z);
+	if(xy > threshold ||xz > threshold ||yz > threshold ){
+		ALBEDO = vec3(0);
+	}else{
+		ALBEDO = model_vertex;						
+	}
+}
+
+```
+
+### Post-process shader application: drawing cube edges
 In the shader introduction project, there is a folder called [Post-Process Edges](https://github.com/jkvastad/Godot-Shader-Tutorials/tree/main/shader-introduction/Post-Process%20Edges). Running the scene in this project yields the following animation loop:
 
 ![Godot_fragment_edges](https://github.com/user-attachments/assets/fccd902d-b288-4f72-83a8-e2f43773ea68)
 
-Notice how the edges dissapear when the cubes touch! This is because we are using a post-process shader, which calculates the edges based on the screen colors of a previously rendered screen. This animation uses two shaders - first on to color the face normals of the cube, which is then used by the second shader to color edges when normals change:
+Notice how the edges disappear when the cubes touch! This is because we are using a post-process shader, which calculates the edges based on the screen colors of a previously rendered screen. This animation uses two shaders - first one to color the face normals of the cube, which is then used by the second shader to color edges when normals change:
 
 ```glsl
 // Shader for coloring surfaces with model normals.
@@ -110,7 +141,7 @@ void fragment() {
 // Assumes the model is colored according to its model normals
 shader_type spatial;
 render_mode unshaded;
-//Screen pixel colors from precious rendering pass
+//Screen pixel colors from previous rendering pass
 uniform sampler2D screen_texture : hint_screen_texture; 
 
 bool is_neighbour_pixel_same_color(vec3 color,vec2 screen_uv_offset){
