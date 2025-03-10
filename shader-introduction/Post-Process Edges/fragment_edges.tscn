@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dugo6toolu4a3"]
+
+[ext_resource type="Script" path="res://Post-Process Edges/FragmentEdges.cs" id="1_bi563"]
+[ext_resource type="Material" uid="uid://b7pwbvblf7cdv" path="res://Post-Process Edges/edge_material.tres" id="2_bm1ey"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_bm1s1"]
+material = ExtResource("2_bm1ey")
+
+[node name="FragmentEdges" type="Node" node_paths=PackedStringArray("box2")]
+script = ExtResource("1_bi563")
+box2 = NodePath("Box2")
+
+[node name="Box1" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_bm1s1")
+
+[node name="Box2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+mesh = SubResource("BoxMesh_bm1s1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 1, 1, 2)

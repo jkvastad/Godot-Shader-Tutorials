@@ -1,6 +1,7 @@
 // Draws the edges of a cube
 // Uses cube specific vertex positions to calculate edges
 shader_type spatial;
+render_mode unshaded;
 varying vec3 model_vertex;
 
 void vertex() {	

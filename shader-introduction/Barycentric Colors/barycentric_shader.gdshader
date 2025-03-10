@@ -13,10 +13,10 @@ const vec3 BARYCENTRIC_COORDINATES[] = {
 void vertex() {
 	// Current vertex index (search for "VBO indexing" for more details)
 	// Every three indices make a triangle
-	vertex_position = BARYCENTRIC_COORDINATES[VERTEX_ID%3];	
+	vertex_position = BARYCENTRIC_COORDINATES[VERTEX_ID%3];
 }
 
 void fragment() {
 	// Note how the colors are interpolated between the vertices of our cubes triangles
-	ALBEDO = vertex_position;	
+	ALBEDO = vertex_position;
 }

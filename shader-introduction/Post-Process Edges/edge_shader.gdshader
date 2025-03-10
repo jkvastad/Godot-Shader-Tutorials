@@ -1,6 +1,7 @@
 // Shader used to draw edges around planes
 // Assumes the model is colored according to its model normals
 shader_type spatial;
+render_mode unshaded;
 //Screen pixel colors from precious rendering pass
 uniform sampler2D screen_texture : hint_screen_texture; 
 

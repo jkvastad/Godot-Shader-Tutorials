@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://bicxkbq1awnr6"]
+
+[ext_resource type="Script" path="res://Cube Vertex Edges/VertexEdges.cs" id="1_5xqco"]
+[ext_resource type="Shader" path="res://Cube Vertex Edges/vertex_edges.gdshader" id="2_2veps"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kur3n"]
+render_priority = 0
+shader = ExtResource("2_2veps")
+
+[sub_resource type="BoxMesh" id="BoxMesh_bf0yw"]
+material = SubResource("ShaderMaterial_kur3n")
+
+[node name="VertexEdges" type="Node" node_paths=PackedStringArray("box2")]
+script = ExtResource("1_5xqco")
+box2 = NodePath("Box2")
+
+[node name="Box1" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_bf0yw")
+
+[node name="Box2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+mesh = SubResource("BoxMesh_bf0yw")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 1, 1, 2)

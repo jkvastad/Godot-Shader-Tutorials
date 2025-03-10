@@ -1,6 +1,7 @@
 // Shader for coloring surfaces with model normals.
 // Used to e.g. separate planes in post processing
 shader_type spatial;
+render_mode unshaded;
 varying flat vec3 model_normal;   
 
 void vertex() {	        
