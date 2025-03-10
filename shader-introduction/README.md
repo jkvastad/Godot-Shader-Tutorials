@@ -80,3 +80,65 @@ void fragment() {
 ```
 
 Note how each corner of each triangle on the cube is red, greed or blue, and the values inbetween are interpolated between them.
+
+### Vertex shader application: drawing cube edges
+In the shader introduction project, there is a folder called [Post-Process Edges](https://github.com/jkvastad/Godot-Shader-Tutorials/tree/main/shader-introduction/Post-Process%20Edges). Running the scene in this project yields the following animation loop:
+
+![Godot_fragment_edges](https://github.com/user-attachments/assets/fccd902d-b288-4f72-83a8-e2f43773ea68)
+
+Notice how the edges dissapear when the cubes touch! This is because we are using a post-process shader, which calculates the edges based on the screen colors of a previously rendered screen. This animation uses two shaders - first on to color the face normals of the cube, which is then used by the second shader to color edges when normals change:
+
+```glsl
+// Shader for coloring surfaces with model normals.
+// Used to e.g. separate planes in post processing
+shader_type spatial;
+render_mode unshaded;
+varying flat vec3 model_normal;   
+
+void vertex() {	        
+	// Use model normals instead of world normals
+	model_normal = NORMAL;
+}
+
+void fragment() {		
+	// negative values are clamped to 0, instead discard negative sign
+	ALBEDO = abs(model_normal);
+}
+```
+```glsl
+// Shader used to draw edges around planes
+// Assumes the model is colored according to its model normals
+shader_type spatial;
+render_mode unshaded;
+//Screen pixel colors from precious rendering pass
+uniform sampler2D screen_texture : hint_screen_texture; 
+
+bool is_neighbour_pixel_same_color(vec3 color,vec2 screen_uv_offset){
+	// Arbitrary value to avoid inexact floating point equality
+	float error_threshold = 0.01; 
+	return length(color - texture(screen_texture,screen_uv_offset,0.0).rgb)>error_threshold;
+}
+
+void fragment() {
+	//pixels to screen UV
+	int outline_pixels = 1;
+	float outline_width = float(outline_pixels)/VIEWPORT_SIZE.x; 
+		
+	vec2 left = SCREEN_UV + vec2(-outline_width,0);
+	vec2 right = SCREEN_UV + vec2(outline_width,0);
+	vec2 up = SCREEN_UV + vec2(0,outline_width);
+	vec2 down = SCREEN_UV + vec2(0,-outline_width);
+	
+	vec3 pixel_color = texture(screen_texture,SCREEN_UV,0.0).rgb;	
+		
+	// Compare colors from previous pass around the current fragment pixel
+	if(is_neighbour_pixel_same_color(pixel_color,left)
+	||is_neighbour_pixel_same_color(pixel_color,right)
+	||is_neighbour_pixel_same_color(pixel_color,up)
+	||is_neighbour_pixel_same_color(pixel_color,down)){
+		ALBEDO = vec3(0,0,0);	
+	}else{
+		ALBEDO = pixel_color;				
+	}
+	}	
+```
