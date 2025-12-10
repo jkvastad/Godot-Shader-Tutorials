@@ -1,0 +1,49 @@
+[gd_scene load_steps=10 format=3 uid="uid://d0msdchiwj0i5"]
+
+[ext_resource type="Shader" uid="uid://cagbk60xuwn1" path="res://grid_lines.gdshader" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://bxfkj1kh2742h" path="res://Main.cs" id="1_1bvp3"]
+[ext_resource type="Shader" uid="uid://c57v7jtbq06or" path="res://select_grid_outline.gdshader" id="1_h2yge"]
+[ext_resource type="Shader" uid="uid://f6urljce2uc3" path="res://red.gdshader" id="2_h2yge"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7mycd"]
+render_priority = 0
+shader = ExtResource("1_h2yge")
+shader_parameter/grid_point = Vector3(0, 0, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1bvp3"]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_7mycd")
+shader = ExtResource("1_0xm2m")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_1bvp3")
+shader = ExtResource("2_h2yge")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7dm0k"]
+lightmap_size_hint = Vector2i(12, 12)
+material = SubResource("ShaderMaterial_lquwl")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1bvp3"]
+size = Vector3(2, 0.001, 2)
+
+[node name="Main" type="Node" node_paths=PackedStringArray("Camera3D", "MeshInstance3D")]
+script = ExtResource("1_1bvp3")
+Camera3D = NodePath("Camera3D")
+MeshInstance3D = NodePath("Area3D/MeshInstance3D")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 4.229974e-08, -1.4116676e-09, -3.5926814e-08, 0.8660256, 0.4999997, 2.237239e-08, -0.4999997, 0.8660256, 0, 2, 5)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 3, 0)
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(4, 0, 0, 0, 2.828427, -2.828427, 0, 2.828427, 2.828427, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D"]
+mesh = SubResource("PlaneMesh_7dm0k")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_1bvp3")
